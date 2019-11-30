@@ -69,7 +69,6 @@ def main():
         db, coll = connectCollection('chats','messages_linked')
         query = {'idChat': int(chat_id)}
         test_query = coll.find(query)
-        # print(list(test_query))
         messages = {}
         for index,dictionary in enumerate(test_query):
             index += 1
