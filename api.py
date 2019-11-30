@@ -3,6 +3,7 @@ from bottle import route, run, get, post, request
 import bson
 import os
 import json
+import re
 from dotenv import load_dotenv
 load_dotenv()
 from src.mongo import connectCollection
@@ -35,13 +36,29 @@ def main():
 
 
     @post('/chat/create')
-    def createChat(user_id):
+    def createChat():
         '''
         Creates a conversation to load messages
-        input: An array of user ids
+        input: A dictionary containing an array of user ids: e.g. {'users': '[8, 9, 10]'}
         output: chat_id
         '''
-        return None
+        users = str(request.forms.get('users'))
+        print(users)
+        db, coll = connectCollection('chats','chats')
+        data = list(coll.aggregate([{'$project':{'idChat':1}}]))
+        newChat = {'idChat':max([e['idChat'] for e in data])+1, 'users': users}
+        print(newChat)
+         # Checking if users exist in the database
+        db2, coll2 = connectCollection('chats','users')
+        usersData = list(coll2.aggregate([{'$project':{'idUser':1}}]))
+        chatUsers = [int(e) for e in re.sub('\[|\]','',newChat['users']).split(', ')]
+        for e in chatUsers:
+            if e not in [e['idUser'] for e in usersData]:
+                error = 'Sorry, one or more of the users you are trying to include do not exist in the database. You must create them first.'
+                return {'Exception':error}
+        # Inserting new chat to the database:
+        chat_id = coll.insert_one(newChat).inserted_id
+        return {'ObjectId': str(chat_id), 'ChatId': newChat['idChat']}
 
 
     @post('/chat/<chat_id>/adduser')

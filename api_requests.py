@@ -10,3 +10,6 @@ sentiments = requests.get(f'http://localhost:8080/chat/{chat_id}/sentiment').jso
 newuser = {'username': 'Cristina Rota'}
 users = requests.post('http://localhost:8080/user/create', data=newuser).json()
 
+newchat = {'users': '[8, 9, 10]'}
+chats = requests.post('http://localhost:8080/chat/create', data=newchat).json()
+
