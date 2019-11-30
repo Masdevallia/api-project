@@ -11,14 +11,27 @@ from src.sentiment import sentimentAnalyzer
 
 def main():
 
+
     @post('/user/create')
-    def createUser(username):
+    def createUser():
         '''
         Creates a user and saves it into the database
-        input: the user name (str)
+        input: the user's name (dic): e.g. {'username': 'Cristina Rota'}
         output: user_id
         '''
-        return None
+        username = str(request.forms.get('username'))
+        db, coll = connectCollection('chats','users')
+        data = list(coll.aggregate([{'$project':{'idUser':1}}]))
+        newUser = {'idUser':max([e['idUser'] for e in data])+1, 'userName': username}
+        # Checking that the given username does not already exist in the database:
+        takenNames = list(coll.aggregate([{'$project':{'userName':1}}]))
+        if newUser['userName'] in [e['userName'] for e in takenNames]:
+            error = 'Sorry, there is already a user with that exact name in the database'
+            return {'Exception':error}
+        else:
+            # Inserting new user to the database:
+            user_id = coll.insert_one(newUser).inserted_id
+            return {'ObjectId': str(user_id), 'UserId': newUser['idUser']}
 
 
     @post('/chat/create')
@@ -72,7 +85,6 @@ def main():
         for index,dictionary in enumerate(test_query):
             index += 1
             messages[f'message_{index}'] = dictionary['text']
-        print(messages)
         return messages
 
 
@@ -95,16 +107,15 @@ def main():
         input: user_id
         output: json array with top 3 similar users
         '''
+
         return None
 
 
-    run(host='0.0.0.0', port=8080)
+    port = int(os.getenv('PORT', 8080))
+    host = os.getenv('IP','0.0.0.0')
+    run(host=host, port=port, debug=True)
+    # run(host='0.0.0.0', port=8080, debug=True)
     # run(host='localhost', port=8080)
-
-    # port = int(os.getenv("PORT", 8080))
-    # host = os.getenv('IP','0.0.0.0')
-    # print(f"Running server {port}....")
-    # run(host="0.0.0.0", port=port, debug=True)
 
 
 if __name__=="__main__":
