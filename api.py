@@ -1,5 +1,4 @@
 
-
 from bottle import route, run, get, post, request
 import bson
 import os
@@ -56,7 +55,7 @@ def main():
 
     @get("/")
     def index():
-        return 'Welcome to the chat sentiment analysis API!'
+        return 'Welcome to the chat sentiment analysis API'
 
 
     @get('/chat/<chat_id>/list')
@@ -106,6 +105,7 @@ def main():
     # host = os.getenv('IP','0.0.0.0')
     # print(f"Running server {port}....")
     # run(host="0.0.0.0", port=port, debug=True)
+
 
 if __name__=="__main__":
     main()
