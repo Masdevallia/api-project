@@ -9,11 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Connecting to MongoDB Atlas:
-password = os.getenv("ATLAS_MONGO_PASS")
-connection = "mongodb+srv://masdevallia:{}@clusterdataanalysis-9nklb.mongodb.net/test?retryWrites=true&w=majority".format(password)
+# password = os.getenv("ATLAS_MONGO_PASS")
+# connection = "mongodb+srv://masdevallia:{}@clusterdataanalysis-9nklb.mongodb.net/test?retryWrites=true&w=majority".format(password)
 
 # Importing original messages data to MongoDB:
-client = MongoClient(connection)
+# client = MongoClient(connection)
 db, coll = connectCollection('chats','messages')
 with open('./input/chats.json', encoding="utf8") as f:
     chats_json = json.load(f)
