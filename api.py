@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.mongo import connectCollection
+import json
 
 
 @post('/user/create')
@@ -67,7 +68,9 @@ def getMessages(chat_id):
     query = {'idChat': int(chat_id)}
     test_query = coll.find(query)
     print(list(test_query))
-    return list(test_query)
+    # jsonlist = json.dumps(list(test_query))
+    # return jsonlist
+    return {'name': 'Cris'}
 
 
 @get('/chat/<chat_id>/sentiment')
