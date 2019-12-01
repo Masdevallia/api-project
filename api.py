@@ -23,6 +23,14 @@ from src.sentiment import *
 def main():
 
 
+    @get('/user/create')
+    def userForm():
+        return '''<form method="post" action="/user/create">
+                    Insert the new user's name: <input name="username" type="text" />
+                    <input type="submit" />
+                </form>'''
+
+
     @post('/user/create')
     def createUser():
         '''
@@ -43,6 +51,14 @@ def main():
             # Inserting new user to the database:
             user_id = coll.insert_one(newUser).inserted_id
             return {'ObjectId': str(user_id), 'UserId': newUser['idUser']}
+
+
+    @get('/chat/create')
+    def chatForm():
+        return '''<form method="post" action="/chat/create">
+                    Insert an array of user ids (e.g. [8, 10]): <input name="users" type="text" />
+                    <input type="submit" />
+                </form>'''
 
 
     @post('/chat/create')
