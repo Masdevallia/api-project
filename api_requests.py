@@ -26,5 +26,5 @@ usertochat = requests.post(f'http://localhost:8080/chat/{chat_id}/adduser', data
 
 # Add a message to an existing chat:
 chat_id = 0
-message = {'user':0, 'message':'Moron!'}
+message = {'user':0, 'message':'Hi!'}
 newMessage = requests.post(f'http://localhost:8080/chat/{chat_id}/addmessage', data=message).json()

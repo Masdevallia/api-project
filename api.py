@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import datetime
 from src.mongo import connectCollection
-from src.sentiment import sentimentAnalyzer
+from src.sentiment import *
 
 
 def main():
@@ -142,12 +142,15 @@ def main():
         output: json array with all messages from this chat_id
         '''
         db, coll = connectCollection('chats','messages_linked')
-        query = {'idChat': int(chat_id)}
-        test_query = coll.find(query)
+        data = list(coll.find({'idChat': int(chat_id)}))
         messages = {}
-        for index,dictionary in enumerate(test_query):
+
+        for index,dictionary in enumerate(data):
             index += 1
-            messages[f'message_{index}'] = dictionary['text']
+            messages[f'message_{index}'] = {'user': dictionary['userName'],
+                                            'date': str(dictionary['datetime'])[0:10],
+                                            'time': str(dictionary['datetime'])[11:19],
+                                            'text': dictionary['text']}
         if len(messages) == 0:
             error = 'Sorry, this chat does not exist in the database'
             return {'Exception':error}
@@ -167,6 +170,7 @@ def main():
             return messages
         else:
             messagesSentiment = sentimentAnalyzer(messages)
+            plotSentiments(messagesSentiment)
             return messagesSentiment
 
 
