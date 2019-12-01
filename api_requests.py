@@ -11,6 +11,10 @@ messages = requests.get(f'http://localhost:8080/chat/{chat_id}/list').json()
 chat_id = 0
 sentiments = requests.get(f'http://localhost:8080/chat/{chat_id}/sentiment').json()
 
+# Get user recommendations:
+user_id = 1
+recommendations = requests.get(f'http://localhost:8080/user/{user_id}/recommend').json()
+
 # Add a new user:
 newuser = {'username': 'Cristina Rota'}
 users = requests.post('http://localhost:8080/user/create', data=newuser).json()

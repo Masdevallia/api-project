@@ -1,12 +1,21 @@
 
 from bottle import route, run, get, post, request
 import bson
-import os
 import json
 import re
+import datetime
+import os
 from dotenv import load_dotenv
 load_dotenv()
-import datetime
+
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+# nltk.download('punkt')
+# nltk.download('stopwords')
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity as distance
+import numpy as np
+
 from src.mongo import connectCollection
 from src.sentiment import *
 
@@ -181,7 +190,29 @@ def main():
         input: user_id
         output: json array with top 3 similar users
         '''
-        return None
+        db, coll = connectCollection('chats','messages_linked')
+        data = list(coll.find({}))
+        if int(user_id) not in list(set([e['idUser'] for e in data])):
+            error = 'Sorry, this user does not exist in the database'
+            return {'Exception':error}
+        tokenizer = RegexpTokenizer(r'\w+')
+        stop_words = set(stopwords.words('english'))       
+        TokensDict = {}
+        for userId in list(set([e['idUser'] for e in data])):
+            usersData = list(coll.find({'idUser': userId}))
+            usersTokens = [tokenizer.tokenize(e['text']) for e in usersData]
+            usersTokens_clean = [word for message in usersTokens for word in message if word not in stop_words]
+            TokensDict[f'{userId}'] = ' '.join(usersTokens_clean)
+        count_vectorizer = CountVectorizer()
+        sparse_matrix = count_vectorizer.fit_transform(TokensDict.values())
+        Tokens_term_matrix = sparse_matrix.todense()
+        df = pd.DataFrame(Tokens_term_matrix,columns=count_vectorizer.get_feature_names(),index=TokensDict.keys())
+        similarity_matrix = distance(df, df)
+        sim_df = pd.DataFrame(similarity_matrix, columns=TokensDict.keys(), index=TokensDict.keys())
+        np.fill_diagonal(sim_df.values, 0)
+        # import seaborn as sns
+        # sns.heatmap(sim_df,annot=True)
+        return {'recommended_users': [int(e) for e in list(sim_df[str(user_id)].sort_values(ascending=False)[0:3].index)]}
 
 
     port = int(os.getenv('PORT', 8080))
