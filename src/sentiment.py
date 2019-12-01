@@ -2,7 +2,7 @@
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # nltk.download('vader_lexicon')
-
+from statistics import mean
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,16 +12,21 @@ import seaborn as sns
 def sentimentAnalyzer(data):
     sid = SentimentIntensityAnalyzer()
     newdata = {}
+    newdata['messages'] = {}
     for key, value in data.items():
-        newdata[key] = value
-        newdata[key]['sentiments'] = sid.polarity_scores(value['text'])
+        newdata['messages'][key] = value
+        newdata['messages'][key]['sentiments'] = sid.polarity_scores(value['text'])
+    newdata['chat_sentiment_analysis'] = {'mean_neg': mean([value['sentiments']['neg'] for value in newdata['messages'].values()]),
+                                         'mean_neu': mean([value['sentiments']['neu'] for value in newdata['messages'].values()]), 
+                                         'mean_pos': mean([value['sentiments']['pos'] for value in newdata['messages'].values()]), 
+                                         'mean_compound': mean([value['sentiments']['compound'] for value in newdata['messages'].values()])}
     return newdata
 
 
 def plotSentiments(data):
-    compoundList = [value['sentiments']['compound'] for key,value in data.items()]
+    compoundList = [value['sentiments']['compound'] for key,value in data['messages'].items()]
     df = pd.DataFrame(compoundList, columns=['compound'])
-    df['message'] = [e for e in range(1,len(data.keys())+1)]
+    df['message'] = [e for e in range(1,len(data['messages'].keys())+1)]
     df['sentiments'] = ['positive' if e > 0 else ('negative' if e < 0 else 'neutral') for e in compoundList]
     sns.set(style="white")
     sns.set_palette("deep")
