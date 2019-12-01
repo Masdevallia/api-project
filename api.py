@@ -53,7 +53,7 @@ def main():
         usersData = list(coll2.aggregate([{'$project':{'idUser':1}}]))
         chatUsers = [int(e) for e in re.sub('\[|\]','',newChat['users']).split(', ')]
         for e in chatUsers:
-            if e not in [e['idUser'] for e in usersData]:
+            if e not in [f['idUser'] for f in usersData]:
                 error = 'Sorry, one or more of the users you are trying to include do not exist in the database. You must create them first.'
                 return {'Exception':error}
         # Inserting new chat to the database:
@@ -62,17 +62,34 @@ def main():
 
 
     @post('/chat/<chat_id>/adduser')
-    def addUserToChat(chat_id, user_id):
+    def addUserToChat(chat_id):
         '''
         Adds a user to a chat (just in case you want to add more users to a chat after it's creation)
-        input: user_id
+        input: the user's id (dic): e.g. {'userId': 0}
         output: user_id, chat_id
         '''
-        return None
+        db, coll = connectCollection('chats','chats')
+        data = list(coll.find({'idChat': int(chat_id)}))
+        if len(data) == 0:
+            error = "Sorry, this chat doesn't exist. You must create it first."
+            return {'Exception':error}
+        user = int(request.forms.get('userId'))
+        db2, coll2 = connectCollection('chats','users')
+        usersData = list(coll2.aggregate([{'$project':{'idUser':1}}]))
+        if user not in [e['idUser'] for e in usersData]:
+            error = 'Sorry, the user you are trying to include does not exist in the database. You must create it first.'
+            return {'Exception':error}
+        users = [int(e) for e in re.sub('\[|\]','',data[0]['users']).split(', ')]        
+        if user in users:
+            error = 'Sorry, this user is already part of the chat'
+            return {'Exception':error}
+        users.append(user)
+        coll.update_one({'idChat': int(chat_id)}, {'$set':{'users':str(users)}})
+        return {'UserId': user, 'ChatId': int(chat_id)}
 
 
     @post('/chat/<chat_id>/addmessage')
-    def addMessageToChat(chat_id, user_id, message):
+    def addMessageToChat(chat_id):
         '''
         Adds a message to an existing chat
         input: chat_id, user_id, message
@@ -102,7 +119,11 @@ def main():
         for index,dictionary in enumerate(test_query):
             index += 1
             messages[f'message_{index}'] = dictionary['text']
-        return messages
+        if len(messages) == 0:
+            error = 'Sorry, this chat does not exist in the database'
+            return {'Exception':error}
+        else:
+            return messages
 
 
     @get('/chat/<chat_id>/sentiment')
@@ -113,8 +134,11 @@ def main():
         output: json with all sentiments from messages in the chat
         '''
         messages = getMessages(chat_id)
-        messagesSentiment = sentimentAnalyzer(messages)
-        return messagesSentiment
+        if 'Exception' in messages:
+            return messages
+        else:
+            messagesSentiment = sentimentAnalyzer(messages)
+            return messagesSentiment
 
 
     @get('/user/<user_id>/recommend')
@@ -124,7 +148,6 @@ def main():
         input: user_id
         output: json array with top 3 similar users
         '''
-
         return None
 
 
