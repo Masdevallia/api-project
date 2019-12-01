@@ -6,6 +6,7 @@ import json
 import re
 from dotenv import load_dotenv
 load_dotenv()
+import datetime
 from src.mongo import connectCollection
 from src.sentiment import sentimentAnalyzer
 
@@ -92,13 +93,41 @@ def main():
     def addMessageToChat(chat_id):
         '''
         Adds a message to an existing chat
-        input: chat_id, user_id, message
+        input: chat_id / user_id and message as dict: e.g. {'user':0, 'message':'Hi!'}
         output: message_id
         '''
-        # Help: Before adding the chat message to the database, check that the incoming user is part of 
-        # this chat id. If not, raise an exception.
-        return None
-
+        db, coll = connectCollection('chats','messages_linked')
+        data = list(coll.find({'idChat': int(chat_id)}))
+        user = int(request.forms.get('user'))
+        message = str(request.forms.get('message'))
+        # Checking if the chat exists
+        db2, coll2 = connectCollection('chats','chats')
+        chat = list(coll2.find({'idChat': int(chat_id)}))
+        if len(chat) == 0:
+            error = "Sorry, this chat doesn't exist. You must create it first."
+            return {'Exception':error}
+        # Checking that the incoming user is part of this chat before adding the chat message to the database.
+        chatUsers = [int(e) for e in re.sub('\[|\]','',chat[0]['users']).split(', ')]
+        if user not in chatUsers:
+            error = 'Sorry, this user is not part of the chat. You must add him/her first.'
+            return {'Exception':error}
+        # Adding the new message:
+        db3, coll3 = connectCollection('chats','users')
+        selectedUser = list(coll3.find({'idUser': user}))
+        if len(data) == 0:
+            newMessageId = 0
+        else:
+            newMessageId = max([e['idMessage'] for e in data])+1
+        newMessage = {'datetime': datetime.datetime.utcnow(),
+                        'idChat': int(chat_id),
+                        'idMessage': newMessageId,
+                        'idUser': user,
+                        'text': message,
+                        'userName': selectedUser[0]['userName'],
+                        'user_id': selectedUser[0]['_id']}
+        message_id = coll.insert_one(newMessage).inserted_id
+        return {'ObjectId': str(message_id), 'MessageId': newMessage['idMessage']}
+        
 
     @get("/")
     def index():
