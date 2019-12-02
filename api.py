@@ -195,7 +195,7 @@ def main():
             return messages
         else:
             messagesSentiment = sentimentAnalyzer(messages)
-            # plotSentiments(messagesSentiment)
+            plotSentiments(messagesSentiment)
             return messagesSentiment
 
 

@@ -6,10 +6,10 @@ from statistics import mean
 import pandas as pd
 import os
 
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from pathlib import Path
-# import webbrowser
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+import webbrowser
 
 
 def sentimentAnalyzer(data):
