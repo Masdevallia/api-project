@@ -15,6 +15,11 @@ from src.mongo import connectCollection
 from src.sentiment import *
 from src.recommender import similarityDF
 
+import nltk
+nltk.download('vader_lexicon')
+nltk.download('punkt')
+nltk.download('stopwords')
+
 
 def main():
 

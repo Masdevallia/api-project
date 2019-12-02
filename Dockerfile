@@ -9,7 +9,6 @@ WORKDIR /app
 
 # Install the requirements:
 RUN pip3 install -r requirements.txt
-RUN python3 nltkdownload.py
 
 # Do not run the container in superuser mode:
 RUN adduser --disabled-password myuser
@@ -19,5 +18,6 @@ USER myuser
 CMD ["python3","-u","api.py"]
 
 
-# docker build -t chat-analysis-api .
-# docker run chat-analysis-api
+# docker build -t chatanalysisapi .
+# docker run -p 8080:8080 chatanalysisapi
+
