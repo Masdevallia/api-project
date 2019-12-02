@@ -2,8 +2,9 @@
 
 ## <p align="center">Ironhack's Data Analytics Bootcamp Project IV: APIs and Cloud Databases</p>
 
-<p align="center"><img  src="https://github.com/Masdevallia/chat-sentiment-analysis-service/blob/master/output/sentiments_chart.png" width="300"></p>
+<p align="center"><img  src="https://github.com/Masdevallia/chat-sentiment-analysis-service/blob/master/output/sentiments_chart.png" width="400"></p>
 
+--- 
 
 The main goal of this project was to create an API to store and analyze chat messages and create sentiment metrics.
 
@@ -13,6 +14,8 @@ The main goal of this project was to create an API to store and analyze chat mes
 * Extract sentiment from chat messages and perform a report over a whole conversation: **NLTK sentiment analysis**.
 * Deploy the service with **Docker** to **Heroku** and store messages in a cloud database: **MongoDB Atlas**.
 * Recommend friends to a user based on the contents from chat 'documents' using a **recommender system with NLP analysis**.
+
+--- 
 
 ### Results:
 
@@ -36,6 +39,7 @@ Create a new chat | POST | [/chat/create](http://chatsentimentapi.herokuapp.com/
 Add a user to an existing chat | POST | [/chat/<chat_id>/adduser](http://chatsentimentapi.herokuapp.com/chat/0/adduser) | chat_id, user_id | 0, 1
 Add a message to an existing chat | POST | [/chat/<chat_id>/addmessage](http://chatsentimentapi.herokuapp.com/chat/0/addmessage) | chat_id, user_id, message | 0, 0, 'Hi!'
 
+--- 
 
 ### Example requests from python using the requests package:
 
@@ -73,6 +77,8 @@ message = {'user':0, 'message':'Hi!'}
 newMessage = requests.post(f'http://chatsentimentapi.herokuapp.com/chat/{chat_id}/addmessage', data=message).json()
 
 ```
+
+--- 
 
 ### Deliverables:
 
