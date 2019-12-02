@@ -4,12 +4,12 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # nltk.download('vader_lexicon')
 from statistics import mean
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-# %matplotlib inline
 import os
-from pathlib import Path
-import webbrowser
+
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from pathlib import Path
+# import webbrowser
 
 
 def sentimentAnalyzer(data):
@@ -26,6 +26,7 @@ def sentimentAnalyzer(data):
     return newdata
 
 
+'''
 def plotSentiments(data):
     compoundList = [value['sentiments']['compound'] for key,value in data['messages'].items()]
     df = pd.DataFrame(compoundList, columns=['compound'])
@@ -43,3 +44,4 @@ def plotSentiments(data):
     plt.savefig('./output/sentiments_chart.png', dpi=300, bbox_inches='tight')
     url = "file://{}{}{}".format(str(Path(os.getcwd())),"/output", "/sentiments_chart.png")
     webbrowser.open(url, 2)
+'''
