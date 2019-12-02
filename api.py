@@ -7,17 +7,13 @@ import datetime
 import os
 from dotenv import load_dotenv
 load_dotenv()
-
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 # nltk.download('punkt')
 # nltk.download('stopwords')
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity as distance
-import numpy as np
-
 from src.mongo import connectCollection
 from src.sentiment import *
+from src.recommender import similarityDF
 
 
 def main():
@@ -96,20 +92,24 @@ def main():
         '''
         db, coll = connectCollection('chats','chats')
         data = list(coll.find({'idChat': int(chat_id)}))
+        # Checking if chat exists:
         if len(data) == 0:
             error = "Sorry, this chat doesn't exist. You must create it first."
             return {'Exception':error}
         user = int(request.forms.get('userId'))
         db2, coll2 = connectCollection('chats','users')
         usersData = list(coll2.aggregate([{'$project':{'idUser':1}}]))
+        # Checking if user exists:
         if user not in [e['idUser'] for e in usersData]:
             error = 'Sorry, the user you are trying to include does not exist in the database. You must create it first.'
             return {'Exception':error}
         users = [int(e) for e in re.sub('\[|\]','',data[0]['users']).split(', ')]        
+        # Checking if user is already part of the chat:
         if user in users:
             error = 'Sorry, this user is already part of the chat'
             return {'Exception':error}
         users.append(user)
+        # Adding the new user to the chat:
         coll.update_one({'idChat': int(chat_id)}, {'$set':{'users':str(users)}})
         return {'UserId': user, 'ChatId': int(chat_id)}
 
@@ -208,6 +208,7 @@ def main():
         '''
         db, coll = connectCollection('chats','messages_linked')
         data = list(coll.find({}))
+        # Checking if the user exists in the database:
         if int(user_id) not in list(set([e['idUser'] for e in data])):
             error = 'Sorry, this user does not exist in the database'
             return {'Exception':error}
@@ -219,17 +220,16 @@ def main():
             usersTokens = [tokenizer.tokenize(e['text']) for e in usersData]
             usersTokens_clean = [word for message in usersTokens for word in message if word not in stop_words]
             TokensDict[f'{userId}'] = ' '.join(usersTokens_clean)
-        count_vectorizer = CountVectorizer()
-        sparse_matrix = count_vectorizer.fit_transform(TokensDict.values())
-        Tokens_term_matrix = sparse_matrix.todense()
-        df = pd.DataFrame(Tokens_term_matrix,columns=count_vectorizer.get_feature_names(),index=TokensDict.keys())
-        similarity_matrix = distance(df, df)
-        sim_df = pd.DataFrame(similarity_matrix, columns=TokensDict.keys(), index=TokensDict.keys())
-        np.fill_diagonal(sim_df.values, 0)
-        # import seaborn as sns
-        # sns.heatmap(sim_df,annot=True)
-        return {'recommended_users': [int(e) for e in list(sim_df[str(user_id)].sort_values(ascending=False)[0:3].index)]}
-
+        sim_df = similarityDF(TokensDict)
+        recommendedIds = [int(e) for e in list(sim_df[str(user_id)].sort_values(ascending=False)[0:3].index)]
+        db2, coll2 = connectCollection('chats','users')
+        recommendedNames = []
+        for e in recommendedIds:
+            userInfo = list(coll2.find({'idUser': e}))
+            recommendedNames.append(userInfo[0]['userName'])
+        return {'recommended_users_ids': recommendedIds,
+                'recommended_users_names': recommendedNames}
+        
 
     port = int(os.getenv('PORT', 8080))
     host = os.getenv('IP','0.0.0.0')
