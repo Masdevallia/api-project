@@ -1,8 +1,8 @@
-# Chat sentiment analysis service
+# <p align="center">Chat sentiment analysis service</p>
 
-## Ironhack's Data Analytics Bootcamp Project IV
+## <p align="center">Ironhack's Data Analytics Bootcamp Project IV: APIs and Cloud Databases</p>
 
-The main goal of this project was to create an API to analyze chat messages and create sentiment metrics.
+The main goal of this project was to create an API to store and analyze chat messages and create sentiment metrics.
 
 ### Sub-objectives:
 
@@ -20,7 +20,14 @@ The chat sentiment analysis API I developed can be found at: http://chatsentimen
 The examples below show you how to make API calls.
 
 The API has two different types of endpoints:
-* Method Get: To get information from the API.
-* Method Post: To add new information to the database.
+* Method **Get**: To get information from the API.
+* Method **Post**: To add new information to the database.
+
+Description | Method | Request | Parameters
+----------- | ------ | ------- | --------------
+Get chat messages | GET | [/chat/<chat_id>/list](http://chatsentimentapi.herokuapp.com/chat/0/list) | chat_id
+Get sentiment from messages | GET | [/chat/<chat_id>/sentiment](http://chatsentimentapi.herokuapp.com/chat/0/sentiment) | chat_id
+
+
 
 
