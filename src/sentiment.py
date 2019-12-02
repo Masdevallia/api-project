@@ -7,6 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 # %matplotlib inline
+import os
+from pathlib import Path
+import webbrowser
 
 
 def sentimentAnalyzer(data):
@@ -38,3 +41,5 @@ def plotSentiments(data):
     h.set_title('Sentiment analysis')
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig('./output/sentiments_chart.png', dpi=300, bbox_inches='tight')
+    url = "file://{}{}{}".format(str(Path(os.getcwd())),"/output", "/sentiments_chart.png")
+    webbrowser.open(url, 2)
