@@ -19,13 +19,13 @@ from src.recommender import similarityDF
 def main():
 
 
+    # Create a new user:
     @get('/user/create')
     def userForm():
         return '''<form method="post" action="/user/create">
                     Insert the new user's name: <input name="username" type="text" />
                     <input type="submit" />
                 </form>'''
-
 
     @post('/user/create')
     def createUser():
@@ -49,13 +49,13 @@ def main():
             return {'ObjectId': str(user_id), 'UserId': newUser['idUser']}
 
 
+    # Create a new chat:
     @get('/chat/create')
     def chatForm():
         return '''<form method="post" action="/chat/create">
                     Insert an array of user ids (e.g. [8, 10]): <input name="users" type="text" />
                     <input type="submit" />
                 </form>'''
-
 
     @post('/chat/create')
     def createChat():
@@ -83,6 +83,7 @@ def main():
         return {'ObjectId': str(chat_id), 'ChatId': newChat['idChat']}
 
 
+    # Add a user to an existing chat:
     @post('/chat/<chat_id>/adduser')
     def addUserToChat(chat_id):
         '''
@@ -114,6 +115,7 @@ def main():
         return {'UserId': user, 'ChatId': int(chat_id)}
 
 
+    # Add a message to an existing chat:
     @post('/chat/<chat_id>/addmessage')
     def addMessageToChat(chat_id):
         '''
@@ -154,11 +156,13 @@ def main():
         return {'ObjectId': str(message_id), 'MessageId': newMessage['idMessage']}
         
 
+    # Index:
     @get("/")
     def index():
         return 'Welcome to the chat sentiment analysis API'
 
 
+    # Get all messages from a chat:
     @get('/chat/<chat_id>/list')
     def getMessages(chat_id):
         '''
@@ -183,6 +187,7 @@ def main():
             return messages
 
 
+    # Sentiment analyzer:
     @get('/chat/<chat_id>/sentiment')
     def getSentiment(chat_id):
         '''
@@ -199,6 +204,7 @@ def main():
             return messagesSentiment
 
 
+    # User recommender:
     @get('/user/<user_id>/recommend')
     def recommendUsers(user_id):
         '''

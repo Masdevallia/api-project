@@ -26,7 +26,7 @@ def sentimentAnalyzer(data):
     return newdata
 
 
-'''
+
 def plotSentiments(data):
     compoundList = [value['sentiments']['compound'] for key,value in data['messages'].items()]
     df = pd.DataFrame(compoundList, columns=['compound'])
@@ -44,4 +44,3 @@ def plotSentiments(data):
     plt.savefig('./output/sentiments_chart.png', dpi=300, bbox_inches='tight')
     url = "file://{}{}{}".format(str(Path(os.getcwd())),"/output", "/sentiments_chart.png")
     webbrowser.open(url, 2)
-'''

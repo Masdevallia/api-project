@@ -70,6 +70,5 @@ def main():
     with open('./input/chats.json', 'w') as file:
         json.dump(data, file, default=json_util.default)
 
-
 if __name__=="__main__":
     main()
