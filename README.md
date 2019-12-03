@@ -36,8 +36,8 @@ Get sentiment from messages | GET | [/chat/<chat_id>/sentiment](http://chatsenti
 Get user recommendations | GET | [/user/<user_id>/recommend](http://chatsentimentapi.herokuapp.com/user/0/recommend) | user_id | 1
 Create a new user | POST | [/user/create](http://chatsentimentapi.herokuapp.com/user/create) | username | Edward Bloom
 Create a new chat | POST | [/chat/create](http://chatsentimentapi.herokuapp.com/chat/create) | users array | [8, 9, 10]
-Add a user to an existing chat | POST | [/chat/<chat_id>/adduser](http://chatsentimentapi.herokuapp.com/chat/0/adduser) | chat_id, user_id | 0, 1
-Add a message to an existing chat | POST | [/chat/<chat_id>/addmessage](http://chatsentimentapi.herokuapp.com/chat/0/addmessage) | chat_id, user_id, message | 0, 0, 'Hi!'
+Add a user to an existing chat | POST | /chat/<chat_id>/adduser | chat_id, user_id | 0, 1
+Add a message to an existing chat | POST | /chat/<chat_id>/addmessage | chat_id, user_id, message | 0, 0, 'Hi!'
 
 ##  
 
